@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,8 @@ public class Abrigo {
 
     @OneToMany(mappedBy = "abrigo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Pet> pets;
+
+    private LocalDate localDate;
 
     public Abrigo(SalvarAbrigoDto dto){
         this.cnpj = dto.cnpj();
