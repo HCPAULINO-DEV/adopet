@@ -1,16 +1,16 @@
 package com.my.adopet_api.controller;
 
-import com.my.adopet_api.dto.AtualizarAbrigoDto;
-import com.my.adopet_api.dto.InformarAbrigoDto;
-import com.my.adopet_api.dto.InformarTutorDto;
-import com.my.adopet_api.dto.SalvarAbrigoDto;
+import com.my.adopet_api.dto.*;
 import com.my.adopet_api.model.Abrigo;
 import com.my.adopet_api.repository.AbrigoRepository;
+import com.my.adopet_api.security.TokenService;
 import com.my.adopet_api.service.AbrigoService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,14 +21,33 @@ import java.util.List;
 public class AbrigoController {
 
     @Autowired
+    private AuthenticationManager manager;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @Autowired
     private AbrigoRepository abrigoRepository;
 
     @Autowired
     private AbrigoService abrigoService;
 
-    @PostMapping
-    public ResponseEntity salvarAbrigo(@RequestBody @Valid SalvarAbrigoDto dto, UriComponentsBuilder uriComponentsBuilder){
-        Abrigo abrigo = new Abrigo(dto);
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Injeção do PasswordEncoder
+
+    @PostMapping("/login")
+    public ResponseEntity efetuarLogin(@RequestBody @Valid AuthenticationDto dto) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
+        var authentication = manager.authenticate(authenticationToken);
+
+        var tokenJWT = tokenService.gerarToken((Abrigo) authentication.getPrincipal());
+
+        return ResponseEntity.ok(new TokenJwtDto(tokenJWT));
+    }
+
+    @PostMapping("/cadastrar")
+    public ResponseEntity salvarAbrigo(@RequestBody @Valid SalvarAbrigoDto dto, UriComponentsBuilder uriComponentsBuilder) {
+        Abrigo abrigo = new Abrigo(dto, passwordEncoder); // Usa o PasswordEncoder injetado
         abrigoRepository.save(abrigo);
 
         var uri = uriComponentsBuilder.path("/abrigos/{id}").buildAndExpand(abrigo.getId()).toUri();

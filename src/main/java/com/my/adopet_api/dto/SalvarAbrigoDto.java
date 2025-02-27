@@ -5,6 +5,8 @@ import com.my.adopet_api.model.Endereco;
 public record SalvarAbrigoDto(
         String cnpj,
         String nome,
-        Endereco endereco
+        Endereco endereco,
+        String email,
+        String password
 ) {
 }

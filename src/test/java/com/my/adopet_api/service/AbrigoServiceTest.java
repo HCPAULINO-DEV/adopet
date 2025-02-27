@@ -10,6 +10,8 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -53,9 +55,9 @@ class AbrigoServiceTest {
     }
 
     @Test
-    public void buscarAbrigoPorId_AbrigoEncontrado(){
+    public void buscarAbrigoPorId_AbrigoEncontrado(PasswordEncoder passwordEncoder){
         Long id = 1L;
-        Abrigo abrigo = new Abrigo(dto);
+        Abrigo abrigo = new Abrigo(dto, passwordEncoder);
         abrigo.setId(id);
         BDDMockito.when(abrigoRepository.findById(abrigo.getId())).thenReturn(Optional.of(abrigo));
 
@@ -64,9 +66,9 @@ class AbrigoServiceTest {
     }
 
     @Test
-    public void buscarAbrigoPorId_AbrigoNaoEncontrado(){
+    public void buscarAbrigoPorId_AbrigoNaoEncontrado(PasswordEncoder passwordEncoder){
 
-        Abrigo abrigo = new Abrigo(dto);
+        Abrigo abrigo = new Abrigo(dto, passwordEncoder);
 
         BDDMockito.when(abrigoRepository.findById(abrigo.getId())).thenReturn(Optional.empty());
 
