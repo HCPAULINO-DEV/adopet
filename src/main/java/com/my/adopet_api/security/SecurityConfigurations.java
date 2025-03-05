@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +30,8 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/abrigos/login", "/abrigos/cadastrar").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/tutores/login", "/tutores/cadastrar").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/abrigos/{id}").permitAll();
                     req.anyRequest().authenticated(); // Requer autenticação para outros endpoints
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) // Adiciona filtro personalizado

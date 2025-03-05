@@ -7,13 +7,20 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "tutor")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Tutor {
+public class Tutor implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,12 +39,20 @@ public class Tutor {
 
     private String sobre;
 
-    public Tutor(SalvarTutorDto dto){
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    private String password;
+
+    public Tutor(SalvarTutorDto dto, PasswordEncoder passwordEncoder){
         this.foto = dto.foto();
         this.nome = dto.nome();
         this.telefone = dto.telefone();
         this.cidade = dto.cidade();
         this.sobre = dto.sobre();
+        this.email = dto.email();
+        this.password = passwordEncoder.encode(dto.password()); // Criptografa a senha antes de salvar
     }
 
     public void atualizarTutor(AtualizarTutorDto dto){
@@ -56,5 +71,46 @@ public class Tutor {
         if (dto.sobre() != null){
             this.sobre = dto.sobre();
         }
+        if (dto.password() != null){
+            this.email = dto.password();
+        }
+        if (dto.password() != null){
+            this.email = dto.password();
+        }
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

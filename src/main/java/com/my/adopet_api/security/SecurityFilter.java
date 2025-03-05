@@ -1,6 +1,7 @@
 package com.my.adopet_api.security;
 
 import com.my.adopet_api.repository.AbrigoRepository;
+import com.my.adopet_api.repository.TutorRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,16 +24,29 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
     private AbrigoRepository abrigoRepository;
 
+    @Autowired
+    private TutorRepository tutorRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
             var subject = tokenService.getSubject(tokenJWT);
-            var usuario = abrigoRepository.findByEmail(subject);
 
-            var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Primeiro tenta encontrar no Abrigo
+            var abrigo = abrigoRepository.findByEmail(subject);
+            if (abrigo != null) {
+                var authentication = new UsernamePasswordAuthenticationToken(abrigo, null, abrigo.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                // Se não encontrar no Abrigo, tenta encontrar no Tutor
+                var tutor = tutorRepository.findByEmail(subject);
+                if (tutor != null) {
+                    var authentication = new UsernamePasswordAuthenticationToken(tutor, null, tutor.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
         }
 
         filterChain.doFilter(request, response);

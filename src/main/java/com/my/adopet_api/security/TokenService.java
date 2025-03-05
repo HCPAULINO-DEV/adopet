@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.my.adopet_api.model.Abrigo;
+import com.my.adopet_api.model.Tutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,20 @@ public class TokenService {
                     .withSubject(abrigo.getUsername())
                     .withExpiresAt(dataExpiracao())
                     .withClaim("id", abrigo.getId())
+                    .sign(algoritmo);
+        } catch (JWTCreationException exception) {
+            throw new RuntimeException("Erro ao gerar token", exception);
+        }
+    }
+
+    public String gerarToken(Tutor t) {
+        try {
+            var algoritmo = Algorithm.HMAC256(secret);
+            return JWT.create()
+                    .withIssuer("API de Gestão de Pessoas")
+                    .withSubject(t.getUsername())
+                    .withExpiresAt(dataExpiracao())
+                    .withClaim("id", t.getId())
                     .sign(algoritmo);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Erro ao gerar token", exception);

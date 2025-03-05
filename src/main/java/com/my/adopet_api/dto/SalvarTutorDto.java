@@ -7,6 +7,8 @@ public record SalvarTutorDto(
         String nome,
         String telefone,
         String cidade,
-        String sobre
+        String sobre,
+        String email,
+        String password
 ) {
 }
