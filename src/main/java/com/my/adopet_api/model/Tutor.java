@@ -45,6 +45,9 @@ public class Tutor implements UserDetails {
     @NotBlank
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
     public Tutor(SalvarTutorDto dto, PasswordEncoder passwordEncoder){
         this.foto = dto.foto();
         this.nome = dto.nome();

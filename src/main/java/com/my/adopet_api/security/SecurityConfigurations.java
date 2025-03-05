@@ -29,9 +29,18 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable()) // Desativa CSRF
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless
                 .authorizeHttpRequests(req -> {
+                    // Permitir login e cadastro para todos
                     req.requestMatchers(HttpMethod.POST, "/abrigos/login", "/abrigos/cadastrar").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/tutores/login", "/tutores/cadastrar").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/abrigos/{id}").permitAll();
+
+                    // Permitir leitura geral (GET)
+                    req.requestMatchers(HttpMethod.GET, "/**").hasAnyRole("ADMIN", "USER");
+
+                    // Restringir todas as outras ações para ADMIN
+                    req.requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/**").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN");
+
                     req.anyRequest().authenticated(); // Requer autenticação para outros endpoints
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) // Adiciona filtro personalizado

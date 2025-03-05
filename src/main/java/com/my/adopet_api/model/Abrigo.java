@@ -46,6 +46,9 @@ public class Abrigo implements UserDetails {
     @NotBlank
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.ADMIN;
+
     public Abrigo(SalvarAbrigoDto dto, PasswordEncoder passwordEncoder) {
         this.cnpj = dto.cnpj();
         this.nome = dto.nome();
@@ -69,7 +72,7 @@ public class Abrigo implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
     @Override
